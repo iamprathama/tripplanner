@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Trip | Travel AI Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">
+    <span>🌍</span>
+    <h1>Travel<span>AI</span></h1>
+  </div>
+  <div class="nav-links">
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('signup') }}">Signup</a>
+  </div>
+</nav>
+
+<div class="create-trip-hero">
+
+  <div class="create-trip-container">
+    <h1>Tell us your travel preferences 🏕️🌴</h1>
+    <p>Just provide some basic information, and our AI trip planner will generate a customized itinerary based on your preferences.</p>
+
+    <form action="/generate-plan" method="POST">
+
+      <!-- Destination -->
+      <label for="cityInput">What is destination of choice?</label>
+      <input type="text" id="cityInput" name="destination" placeholder="Enter a city..." required autocomplete="off">
+      <ul id="suggestions"></ul>
+
+      <!-- Days -->
+      <label for="days">How many days are you planning your trip?</label>
+      <input type="number" id="days" name="days" placeholder="Ex. 5" min="1" required>
+
+      <!-- Budget -->
+      <label>What is your Budget?</label>
+      <div class="budget-cards">
+        <!-- Repeatable budget card labels -->
+        <label class="budget-card">
+          <input type="radio" name="budget" value="Cheap" required>
+          <div>
+            <span>💵</span>
+            <h3>Cheap</h3>
+            <p>Stay conscious of costs</p>
+          </div>
+        </label>
+        <label class="budget-card">
+          <input type="radio" name="budget" value="Moderate">
+          <div>
+            <span>💰</span>
+            <h3>Moderate</h3>
+            <p>Balanced travel and price</p>
+          </div>
+        </label>
+        <label class="budget-card">
+          <input type="radio" name="budget" value="Luxury">
+          <div>
+            <span>💎</span>
+            <h3>Luxury</h3>
+            <p>Top tier experience</p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Companions -->
+      <label>Who do you plan on traveling with on your next adventure?</label>
+      <div class="budget-cards">
+        <label class="budget-card">
+          <input type="radio" name="companions" value="Solo" required>
+          <div>
+            <span>🛩️</span>
+            <h3>Just Me</h3>
+            <p>A solo travel explorer</p>
+          </div>
+        </label>
+        <label class="budget-card">
+          <input type="radio" name="companions" value="Couple">
+          <div>
+            <span>🥂</span>
+            <h3>A Couple</h3>
+            <p>Two travelers in tandem</p>
+          </div>
+        </label>
+        <label class="budget-card">
+          <input type="radio" name="companions" value="Family">
+          <div>
+            <span>🏡</span>
+            <h3>Family</h3>
+            <p>A fun-loving group</p>
+          </div>
+        </label>
+        <label class="budget-card">
+          <input type="radio" name="companions" value="Friends">
+          <div>
+            <span>⛵</span>
+            <h3>Friends</h3>
+            <p>A bunch of thrill-seekers</p>
+          </div>
+        </label>
+      </div>
+
+      <button type="submit" id="generateButton" >Generate My Trip Plan 🚀</button>
+    <div id="loading" style="display:none;">
+  <p>⏳ Please wait, generating your plan...</p>
+  <div class="loader"></div>
+</div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById("cityInput").addEventListener("input", function() {
+  const query = this.value;
+  const suggestionsList = document.getElementById("suggestions");
+
+  if (query.length < 2) {
+    suggestionsList.innerHTML = "";
+    return;
+  }
+
+  fetch(`https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${query}&countryIds=IN&limit=5&sort=-population`, {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": "f55aac0bf9mshce073f2961d7a5cp1bc58ajsne773ff9ff5e9",
+      "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com"
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    suggestionsList.innerHTML = "";
+    data.data.forEach(city => {
+      const li = document.createElement("li");
+      li.textContent = `${city.city}, ${city.country}`;
+      li.addEventListener("click", function() {
+        document.getElementById("cityInput").value = `${city.city}, ${city.country}`;
+        suggestionsList.innerHTML = "";
+      });
+      suggestionsList.appendChild(li);
+    });
+  })
+  .catch(err => console.error(err));
+});
+
+
+  // === Budget Validation ===
+  document.querySelector("form").addEventListener("submit", function(e) {
+    const budgetSelected = document.querySelector('input[name="budget"]:checked');
+    if (!budgetSelected) {
+      e.preventDefault();
+      alert("Please select a budget option before submitting.");
+    }
+  });
+    const button = form.querySelector("button[type='submit']");
+  button.addEventListener("click", () => {
+    button.style.transform = "scale(0.96)";
+    setTimeout(() => {
+      button.style.transform = "scale(1)";
+    }, 150);
+  });
+// Budget Validation
+
+
+// Wait until DOM is ready
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.querySelector("form");
+  const button = document.getElementById("generateButton");
+  const loading = document.getElementById("loading");
+
+  if (form && button && loading) {
+    // Button click animation
+    button.addEventListener("click", () => {
+      button.style.transform = "scale(0.96)";
+      setTimeout(() => {
+        button.style.transform = "scale(1)";
+      }, 150);
+    });
+
+    // Show loader on form submit
+    form.addEventListener("submit", function (e) {
+      const budgetSelected = document.querySelector('input[name="budget"]:checked');
+      if (!budgetSelected) {
+        e.preventDefault();
+        alert("Please select a budget option before submitting.");
+        return;
+      }
+
+      // Hide button and show loader
+      button.style.display = "none";
+      loading.style.display = "block";
+    });
+  }
+});
+
+
+ // JS code (city autocomplete and validation)
+</script>
+
+</body>
+</html>

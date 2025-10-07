@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Signup | Travel AI Planner{% endblock %}
+
+{% block content %}
+<div class="signup-hero">
+    <div class="signup-container">
+        
+   
+
+        <h2>Create Account</h2>
+    <form action="/signup" method="POST">
+        <label>Name:</label>
+        <input type="text" name="name" required><br><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" required><br><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br><br>
+
+        <button type="submit">Signup</button>
+        <br>
+        <br>
+       <p class="sign-footer">already have account? <a href="/login"> Login</a></p>
+    </form>
+    </div>
+    </div>
+    <br>
+   
+{% endblock %}
